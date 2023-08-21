@@ -1,14 +1,13 @@
 package com.example.healthylivingapp
 
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.widget.ScrollView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -43,139 +42,73 @@ class MainActivity : ComponentActivity() {
 
 @Preview
 @Composable
-fun app() {
-    val numbers = listOf<Int>(1,2,43,5,645)
-    var itemList = mutableListOf<Recipe>()
+fun app(){
 
-    val textState = remember {
+    var recipeName = remember {
+        mutableStateOf("")}
+
+    var recipeUrl = remember {
         mutableStateOf("")
     }
 
-    val textState_url = remember {
-        mutableStateOf("")
-    }
-
-    val scrollState = rememberScrollState()
+    var recipeList = mutableListOf<Recipe>()
 
     Column(
-
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.White, Color.Cyan),
-                    startY = 0f,
-                    endY = 700f
-                )
-            )
-            .verticalScroll(scrollState)
-
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp,
-            text = "Healthy Living App",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            textAlign = TextAlign.Center,
-        )
-
-        Text(
-            fontSize = 16.sp,
-            text = "Powered by J Industries",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-        )
-
-//        Image(
-//            painter = painterResource(id = R.drawable.blaze), contentDescription = "Product Logo",
-//            Modifier
-//                .fillMaxWidth()
-//                .align(Alignment.CenterHorizontally)
-//        )
-
+            
         TextField(
-            value = textState.value, onValueChange = {
-                textState.value = it
-            },
-
-
+            value = recipeName.value,
+            onValueChange = {
+                recipeName.value = it
+        },
             placeholder = {
-                Text(text = "Introduce Data")
-            }, // Text inside the input
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp, start = 30.dp, end = 30.dp)
-                .align(Alignment.CenterHorizontally)
+                Text(text = "Introduce recipe name")
+            },
+            modifier = Modifier.fillMaxWidth()
         )
 
         TextField(
-            value = textState_url.value, onValueChange = {
-                textState_url.value = it
+            value = recipeUrl.value,
+            onValueChange = {
+                recipeUrl.value = it
             },
-
-
             placeholder = {
-                Text(text = "Introduce Data")
-            }, // Text inside the input
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 20.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-
-        Button(
-
-            onClick = {
-
-                //Creating new recipe object
-                val newRecipe: Recipe = Recipe(textState.value,textState_url.value)
-
-                //Adding the new recipe to list to show on LazyColumn
-                itemList.add(newRecipe)
-
-                for(recipe in itemList){
-                    println(recipe.recipeName)
-                    println(recipe.urlImage)
-                }
-
+                Text(text = "Introduce url Image")
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .align(Alignment.CenterHorizontally)
-
+            modifier = Modifier.fillMaxWidth()
+        )
+        
+        
+        Button(onClick = {
+            println("receipt name: ${recipeName.value}+\nURL: ${recipeUrl.value}")
+           val newRecipe = Recipe(recipeName.value,recipeUrl.value)
+            recipeList.add(newRecipe)
+        },
+            modifier = Modifier.fillMaxWidth()
 
         ) {
-            Text(text = "Press here")
+            Text(text = "Add Recipe")
         }
 
-        //Just leaving as pend the lazyColumn...
+        LazyColumn (
+
+                ){
+            items(recipeList) { recipe ->
+                    Text(
+                        text = recipe.recipeName,
+                    )
+
+            }
+        }
+
 
 
     }
 }
 
-/**
- * Custom item for lazyColumn
- */
-@Composable
-fun recipeItem(recipe: Recipe){
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxWidth()
-            .padding(30.dp)
-    ) {
-        Text(
-            text = "$recipe.recipeName")
+data class Recipe(val recipeName: String,val recipeUrl: String)
 
-            //Image
-    }
-}
-
-
-data class Recipe(val recipeName: String, val urlImage:String)
